@@ -421,7 +421,7 @@ int TreeDump (Tree_t* Tree, Cell_t* cell) {
     fprintf(file_dump, "}");
     fclose(file_dump);
     
-    system("open -a /Applications/Graphviz.app '/Users/macbook/Documents/GitHub/Tree/Akinator/dump_tree.gv'");
+    system("open -a /Applications/Graphviz.app '/Users/macbook/Documents/GitHub/Differentiator/Differentiator/dump_tree.gv'");
     
     return 0;
 }
@@ -584,17 +584,17 @@ char* TreeReadFilesRecurs (char* my_buffer, long int number_of_char, Tree_t* Tre
     //craft
     char* str = new char [CELL_SIZE_DATA];
     
-    for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '\'')); ++i, ++my_buffer) {//printf("%c", my_buffer[0]);
-    }
+    for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '\'')); ++i, ++my_buffer) {}
     ++my_buffer;
     for (int i = 0; my_buffer [i] != '\''; ++i) {
         str [i] = my_buffer [i];
         str [i+1] = '\0';
     }
-    //{<<<<<<<<<<<<<<<<<<PRINTF>>>>>>>>>>>>>>>>>>
-    printf("%s\n",str);
-    for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '(') && (my_buffer [0] != ')')); ++i, ++my_buffer) {//printf("%c", my_buffer[0]);
-    }
+    for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '\'')); ++i, ++my_buffer) {}
+    ++my_buffer;
+    
+    for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '(') && (my_buffer [0] != ')')); ++i, ++my_buffer) {}
+    
     Cell_t* cell_new = new Cell_t;
     cell_new->data = str;
     cell_new->number = Tree->size;
@@ -609,14 +609,20 @@ char* TreeReadFilesRecurs (char* my_buffer, long int number_of_char, Tree_t* Tre
         if (next == RIGHT_cell)
             cell->nextr = cell_new;
     
-    //{<<<<<<<<<<<<<<<<<<PRINTF>>>>>>>>>>>>>>>>>>
-    printf("%c\n", my_buffer [0]);
     
     if (my_buffer [0] == '(') {
-        my_buffer = TreeReadFilesRecurs(my_buffer, number_of_char, Tree, cell_new, LEFT_cell);
-        my_buffer = TreeReadFilesRecurs(my_buffer, number_of_char, Tree, cell_new, RIGHT_cell);
-    }
+        my_buffer = TreeReadFilesRecurs (my_buffer, number_of_char, Tree, cell_new, LEFT_cell);
         
+        ++my_buffer;
+        for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '(') && (my_buffer [0] != ')')); ++i, ++my_buffer) {}
+        
+        if (my_buffer [0] == ')') {
+            return my_buffer;
+        }
+        
+        my_buffer = TreeReadFilesRecurs (my_buffer, number_of_char, Tree, cell_new, RIGHT_cell);
+    }
+    
     return my_buffer;
 }
 
