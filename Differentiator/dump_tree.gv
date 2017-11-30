@@ -1,20 +1,8 @@
 digraph list {
 	node [shape = record,height=.1];
 	"node2" [label = "<f0>x" ] ;
-	"node5" [label = "<f0>9" ] ;
-	"node8" [label = "<f0>x" ] ;
-	"node9" [label = "<f0>9" ] ;
-	"node7" [label = "<f0>/" ] ;
-	"node6" [label = "<f0>()" ] ;
-	"node4" [label = "<f0>+" ] ;
-	"node3" [label = "<f0>sin" ] ;
+	"node3" [label = "<f0>5" ] ;
 	"node1" [label = "<f0>*" ] ;
-	"node7":f0 -> "node8":f0 [color=red];
-	"node7":f0 -> "node9":f0  [color=green];
-	"node6":f0 -> "node7":f0 [color=red];
-	"node4":f0 -> "node5":f0 [color=red];
-	"node4":f0 -> "node6":f0  [color=green];
-	"node3":f0 -> "node4":f0 [color=red];
 	"node1":f0 -> "node2":f0 [color=red];
 	"node1":f0 -> "node3":f0  [color=green];
 }

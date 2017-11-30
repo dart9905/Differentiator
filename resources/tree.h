@@ -12,6 +12,7 @@ struct Cell_t  {
     Cell_t* nextr;                 ///<pointer on previous element cell, if his on that it is empty (right)
     Cell_t* prev;                  ///<pointer on next element cell, if his on that it is empty
     int number;                    ///<cell number from the list
+    int type;                      ///<type cell
 };
 
 
@@ -281,6 +282,14 @@ Cell_t* TreePrintFileRecurs (Tree_t* Tree, Cell_t* cell);
  \return Cell_new returns a pointer to a new tree element
  */
 Cell_t* CellNew(Tree_t* Tree);
+
+
+
+Cell_t* TreeCopy (Tree_t* TreeC,Tree_t* Tree, Cell_t* cell);
+
+
+
+Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cell_copy, Cell_t* cell, const int next);
 
 
 
@@ -621,6 +630,13 @@ char* TreeReadFilesRecurs (char* my_buffer, long int number_of_char, Tree_t* Tre
         }
         
         my_buffer = TreeReadFilesRecurs (my_buffer, number_of_char, Tree, cell_new, RIGHT_cell);
+        
+        ++my_buffer;
+        for (int i = 0; ((i < number_of_char) && (my_buffer [0] != '(') && (my_buffer [0] != ')')); ++i, ++my_buffer) {}
+        if (my_buffer [0] == ')') {
+            return my_buffer;
+        }
+        
     }
     
     return my_buffer;
@@ -704,6 +720,44 @@ Cell_t* CellNew(Tree_t* Tree) {
     cell_new->nextr = NULL;
     ++Tree->size;
     return cell_new;
+}
+
+
+
+Cell_t* TreeCopy (Tree_t* TreeC, Tree_t* Tree, Cell_t* cell) {
+    //TreeCopyRecurs (TreeC, Tree, cell);
+    return cell;
+}
+
+
+
+Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cellC, Cell_t* cell, const int next) {
+    assert(TreeC);
+    assert(cellC);
+    assert(cell);
+    
+    Cell_t* cell_copy = CellNew(TreeC);
+    cell_copy->data = cell->data;
+    
+    cell_copy->prev = cellC;
+    
+    if (next == LEFT_cell)
+        cellC->nextl = cell_copy;
+    else
+        if (next == RIGHT_cell)
+            cellC->nextr = cell_copy;
+    
+    if (cell->nextl != NULL) {
+        cell_copy->nextl = TreeCopyRecurs (TreeC, cell_copy, cell->nextl, LEFT_cell);
+        
+    }
+    if (cell->nextr != NULL) {
+        cell_copy->nextr = TreeCopyRecurs (TreeC, cell_copy, cell->nextr, RIGHT_cell);
+    }
+    
+    // функция обязательна должна возвращать pos_prev указатель на предыдующую ветку дерева!!!!!!!!
+    
+    return cell_copy;
 }
 
 
