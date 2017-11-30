@@ -285,10 +285,14 @@ Cell_t* CellNew(Tree_t* Tree);
 
 
 
-Cell_t* TreeCopy (Tree_t* TreeC,Tree_t* Tree, Cell_t* cell);
-
-
-
+/*
+ \brief TreeCopyRecurs copies the entire tree from the "cell" branch (inclusive) to the "cell_copy" sub-branch of the "TreeC" tree, the left or right sub-branch of the "next" sub-branch, given by the constant.
+ \param TreeC wood for a copy
+ \param cell_copy branch for inserting a copy
+ \param cell pointer to the beginning of the copied part of the tree, branches
+ \param next branch sub-branch
+ \return Cell_t Specifies the copied tree, the initial branch of the tree
+*/
 Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cell_copy, Cell_t* cell, const int next);
 
 
@@ -421,8 +425,8 @@ int TreeDump (Tree_t* Tree, Cell_t* cell) {
     fprintf(file_dump, "digraph list {\n\tnode [shape = record,height=.1];\n");
     fclose(file_dump);
     
-    TreeGoRound (Tree, cell, TreePrintNodeUSE1, FROM_BELOW);
-    TreeGoRound (Tree, cell, TreePrintNodeUSE2, FROM_BELOW);
+    TreeGoRound (Tree, cell, TreePrintNodeUSE1, FROM_BELOW); // TreePrintNode1 or TreePrintNodeUSE1
+    TreeGoRound (Tree, cell, TreePrintNodeUSE2, FROM_BELOW); // TreePrintNode2 or TreePrintNodeUSE2
     
     file_dump = fopen(DUMP_DOT_NAME_FILES,"at");
     if (file_dump == NULL)
@@ -461,7 +465,7 @@ Cell_t* TreePrintNodeUSE2 (Tree_t* Tree, Cell_t* cell) {
 Cell_t* TreePrintNode1 (Tree_t* Tree, Cell_t* cell) {
     FILE *file_dump = fopen(DUMP_DOT_NAME_FILES,"at");
     
-    fprintf(file_dump, "\t\"node%i\" [label = \"<f0>data = %s |<f1>nextl = %p |<f2>nextr = %p |<f3>pos = %p |<f4>prev = %p\" ] ;\n", cell->number, cell->data, cell->nextl, cell->nextr, cell, cell->prev);
+    fprintf(file_dump, "\t\"node%i\" [label = \"<f0>data = %s |<f1>nextl = %p |<f2>nextr = %p |<f3>pos = %p |<f4>prev = %p | <f5>type = %i \" ] ;\n", cell->number, cell->data, cell->nextl, cell->nextr, cell, cell->prev, cell->type);
     
     fclose(file_dump);
     return cell->prev;
@@ -724,16 +728,8 @@ Cell_t* CellNew(Tree_t* Tree) {
 
 
 
-Cell_t* TreeCopy (Tree_t* TreeC, Tree_t* Tree, Cell_t* cell) {
-    //TreeCopyRecurs (TreeC, Tree, cell);
-    return cell;
-}
-
-
-
 Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cellC, Cell_t* cell, const int next) {
     assert(TreeC);
-    assert(cellC);
     assert(cell);
     
     Cell_t* cell_copy = CellNew(TreeC);
@@ -741,11 +737,14 @@ Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cellC, Cell_t* cell, const int ne
     
     cell_copy->prev = cellC;
     
-    if (next == LEFT_cell)
-        cellC->nextl = cell_copy;
-    else
-        if (next == RIGHT_cell)
-            cellC->nextr = cell_copy;
+    if (cellC != NULL) {
+        if (next == LEFT_cell)
+            cellC->nextl = cell_copy;
+        else
+            if (next == RIGHT_cell)
+                cellC->nextr = cell_copy;
+    } else
+        printf("WARNING:\n  In TreeCopyRecurs() parameter cellC = %p\n",cellC);
     
     if (cell->nextl != NULL) {
         cell_copy->nextl = TreeCopyRecurs (TreeC, cell_copy, cell->nextl, LEFT_cell);

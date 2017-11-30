@@ -50,10 +50,13 @@ int main() {
     Tree_t* dTree = TreeConstruct(str0);
     
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
+    assert(dTree->cell->nextl);
+    dTree->cell->nextl->prev = dTree->cell;
     
-    TreeDump(Tree, Tree->cell->nextl);
+    TreeDump(dTree, dTree->cell->nextl);
     TreePrintFile(Tree, Tree->cell->nextl);
     TreeDestructor(Tree);
+    TreeDestructor(dTree);
     
     return 0;
 }
@@ -91,31 +94,36 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     assert(dTree);
     assert(cell);
     
-    char dx [] = "1";
-    char dC [] = "0";
     
-    Cell_t* dcell = CellNew(dTree);
+    Cell_t* dcell = NULL;// = CellNew(dTree);
     
-    if (cell->type == T_value)
-        return New_dCell (dTree, T_value, dC, NULL, NULL);
-    
-    if (cell->type == T_symbol)
-        return New_dCell (dTree, T_symbol, dx, NULL, NULL);
-    
-    if (cell->type == T_operator) {
-        Cell_t* pCell = NULL;
-        #define DIFF_( NAME, TYPE, DECLARATION )\
-            if (strcmp(#NAME, cell->data) == 0) {\
-                pCell = (DECLARATION);\
-            }
-        
-        //#include "../resources/diff.h"
-        
-        #undef DIFF_
-        return pCell;
+    if (cell->type == T_value) {
+        char* dC = new char;
+        dC = "0";
+        dcell = New_dCell (dTree, T_value, dC, NULL, NULL);
+        assert(dcell);
     }
     
-    return NULL;
+    if (cell->type == T_symbol) {
+        char* dx = new char;
+        dx = "1";
+        dcell = New_dCell (dTree, T_symbol, dx, NULL, NULL);
+        assert(dcell);
+    }
+    
+    if (cell->type == T_operator) {
+        #define DIFF_( NAME, TYPE, DECLARATION )\
+            if (strcmp(#NAME, cell->data) == 0) {\
+                dcell = (DECLARATION);\
+                assert(dcell);\
+            }
+        
+        #include "../resources/diff.h"
+        
+        #undef DIFF_
+        
+    }
+    return dcell;
 }
 
 
@@ -127,10 +135,8 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
         
         dcell_new->nextl = dcell_l;
         dcell_new->nextr = dcell_r;
-        if (dcell_new->nextl != 0)
-            dcell_new->nextl->prev = dcell_new; //->nextl
-        if (dcell_new->nextr != 0)
-            dcell_new->nextr->prev = dcell_new; //->nextr
+        dcell_new->nextl->prev = dcell_new; //->nextl
+        dcell_new->nextr->prev = dcell_new; //->nextr
         
         dcell_new->type = T_operator;
         dcell_new->data = val;
