@@ -25,7 +25,8 @@ typedef char* TYPE_TREE;
 enum Type_Tree {
     T_symbol = 1,
     T_value = 2,
-    T_operator = 3
+    T_operator = 3,
+    T_const = 4
 };
 
 
@@ -82,6 +83,11 @@ Cell_t* TreeTypeRecurs (Tree_t* Tree, Cell_t* cell) {
         if ('0' <= (cell->data [0]) && (cell->data [0]) <= '9') {
             cell->type = T_value;
         } else
+            if ((strcmp("pi", cell->data) == 0) ||
+                (strcmp("e", cell->data) == 0) ||
+                (strcmp("π", cell->data) == 0)) {
+                cell->type = T_const;
+            } else
             cell->type = T_symbol;
     }
     
@@ -97,7 +103,7 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     
     Cell_t* dcell = NULL;// = CellNew(dTree);
     
-    if (cell->type == T_value) {
+    if ((cell->type == T_value) || (cell->type == T_const)) {
         char* dC = new char;
         dC = "0";
         dcell = New_dCell (dTree, T_value, dC, NULL, NULL);
@@ -135,8 +141,10 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
         
         dcell_new->nextl = dcell_l;
         dcell_new->nextr = dcell_r;
-        dcell_new->nextl->prev = dcell_new; //->nextl
-        dcell_new->nextr->prev = dcell_new; //->nextr
+        if (dcell_l !=NULL)
+            dcell_new->nextl->prev = dcell_new; //->nextl
+        if (dcell_r !=NULL)
+            dcell_new->nextr->prev = dcell_new; //->nextr
         
         dcell_new->type = T_operator;
         dcell_new->data = val;
