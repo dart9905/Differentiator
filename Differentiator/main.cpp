@@ -16,6 +16,7 @@
 
 const char* TREE_FILES = "../resources/save.txt";
 const char* TREE_FILES1 = "../resources/save1.txt";
+const long int LI = 1000000000;
 typedef char* TYPE_TREE;
 
 
@@ -36,6 +37,17 @@ Cell_t* TreeTypeRecurs (Tree_t* Tree, Cell_t* cell);
 
 
 Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* dcell_r);
+
+
+
+Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell);
+
+
+
+double StoD (char* str);
+
+
+char* DtoS (double var);
 
 
 
@@ -163,4 +175,115 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 }
 
 
+/*
+Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
+    if ((cell->type == T_operator) && (cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+        switch (cell->data [0]) {
+            case '+':
+                cell->data = ;//cell->nextr->data + cell->nextl->data;
+                break;
+               
+            case '-':
+                <#statements#>
+                break;
+                
+            case '*':
+                <#statements#>
+                break;
+                
+            case '/':
+                <#statements#>
+                break;
+                
+            default:
+                break;
+        }
+    }
+    return cell;
+}
+*/
 
+
+double StoD (char* str) {
+    double pov = 0;
+    double div = 0;
+    int i = 0;
+    
+    while ((str [i] != '.') && (str [i] != '\0')) {
+        pov = pov * 10 + str[i] - '0';
+        ++i;
+    }
+    
+    if (str [i] == '.') {
+        ++i;
+        int j = 1;
+        
+        while ((str [i] != '\0')) {
+            div = div * 10 + str[i] - '0';
+            ++i;
+            j = j * 10;;
+        }
+        
+        if (j > 0) {
+            div = div / j;
+            pov = pov + div;
+        }
+        
+    }
+    
+    return pov;
+}
+
+
+char* DtoS (double var) {
+    long int maxd = 1;
+    long int maxp = 1;
+    int i = 0;
+    long int j = 0;
+    long int pov = var;
+    long int div = var * LI - pov * LI;
+    long int longdiv = LI;
+    char* str = new char [CELL_SIZE_DATA];
+    
+    
+    while((j == 0) && (div > 0))
+    {
+        div = div / 10;
+        j = div % 10;
+        longdiv = longdiv / 10;
+    }
+    longdiv = longdiv / 10;
+    
+    while (maxp <= pov) maxp = maxp * 10;
+    maxp = maxp / 10;
+    
+    while (maxd <= div) maxd = maxd * 10;
+    
+    while (maxp > 0) {
+        str [i] = pov / maxp + '0';
+        if (pov > 0)
+            pov = pov - (pov / maxp) * maxp;
+        maxp = maxp / 10;
+        ++i;
+    }
+    if (maxd > 0) {
+        str [i] = '.';
+        ++i;
+        
+        while (longdiv != maxd) {
+            str [i] = '0';
+            ++i;
+            longdiv = longdiv / 10;
+        }
+        
+        while (div > 0) {
+            str [i] = div / maxd + '0';
+            div = div - (div / maxd) * maxd;
+            maxd = maxd / 10;
+            ++i;
+        }
+    }
+    str [i] = '\0';
+    return str;
+    
+}
