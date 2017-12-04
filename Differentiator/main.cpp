@@ -55,8 +55,6 @@ int main() {
     
     char str0 [] = "";
     
-    printf("|%s|\n",DtoS(StoD("0") + StoD("0"))); //13000
-    
     Tree_t* Tree = TreeConstruct(str0);
     TreeReadFiles(TREE_FILES, Tree, Tree->cell, LEFT_cell);
     
@@ -177,7 +175,7 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 }
 
 
-/*
+
 Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
     if ((cell->type == T_operator) && (cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
         switch (cell->data [0]) {
@@ -186,15 +184,15 @@ Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
                 break;
                
             case '-':
-                <#statements#>
+                cell->data = DtoS(StoD(cell->nextr->data) - StoD(cell->nextl->data));
                 break;
                 
             case '*':
-                <#statements#>
+                cell->data = DtoS(StoD(cell->nextr->data) * StoD(cell->nextl->data));
                 break;
                 
             case '/':
-                <#statements#>
+                cell->data = DtoS(StoD(cell->nextr->data) / StoD(cell->nextl->data));
                 break;
                 
             default:
@@ -203,14 +201,20 @@ Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
     }
     return cell;
 }
-*/
+
 
 
 double StoD (char* str) {
     double pov = 0;
     double div = 0;
+    bool mark = false;
     int i = 0;
     
+    if (str [i] == '-') {
+        mark = true;
+        ++i;
+    }
+        
     while ((str [i] != '.') && (str [i] != '\0')) {
         pov = pov * 10 + str[i] - '0';
         ++i;
@@ -233,19 +237,31 @@ double StoD (char* str) {
         
     }
     
+    if (mark)
+        pov = (-1) * pov;
+    
     return pov;
 }
 
 
 char* DtoS (double var) {
+    
+    int i = 0;
+    char* str = new char [CELL_SIZE_DATA];
+    
+    if (var < 0) {
+        var = (-1) * var;
+        str [i] = '-';
+        ++i;
+    }
+    
     long int maxd = 1;
     long int maxp = 1;
-    int i = 0;
     long int j = 0;
     long int pov = var;
     long int div = var * LI - pov * LI;
     long int longdiv = LI;
-    char* str = new char [CELL_SIZE_DATA];
+    
     
     
     while((j == 0) && (div > 0))
