@@ -55,6 +55,8 @@ int main() {
     
     char str0 [] = "";
     
+    printf("|%s|\n",DtoS(StoD("0") + StoD("0"))); //13000
+    
     Tree_t* Tree = TreeConstruct(str0);
     TreeReadFiles(TREE_FILES, Tree, Tree->cell, LEFT_cell);
     
@@ -180,7 +182,7 @@ Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
     if ((cell->type == T_operator) && (cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
         switch (cell->data [0]) {
             case '+':
-                cell->data = ;//cell->nextr->data + cell->nextl->data;
+                cell->data = DtoS(StoD(cell->nextr->data) + StoD(cell->nextl->data));
                 break;
                
             case '-':
@@ -252,12 +254,14 @@ char* DtoS (double var) {
         j = div % 10;
         longdiv = longdiv / 10;
     }
+    
     longdiv = longdiv / 10;
     
     while (maxp <= pov) maxp = maxp * 10;
     maxp = maxp / 10;
     
     while (maxd <= div) maxd = maxd * 10;
+    maxd = maxd / 10;
     
     while (maxp > 0) {
         str [i] = pov / maxp + '0';
@@ -283,7 +287,12 @@ char* DtoS (double var) {
             ++i;
         }
     }
+    if (i == 0) {
+        str [i] = '0';
+        ++i;
+    }
     str [i] = '\0';
+    
     return str;
     
 }
