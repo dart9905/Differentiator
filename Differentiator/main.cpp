@@ -224,22 +224,18 @@ int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         
         switch (cell->data [0]) {
             case '+':
-                printf("op +\n");
                 cell = ShortADD (Tree, cell, mark, next);
                 break;
                
             case '-':
-                printf("op -\n");
                 cell = ShortSUB (Tree, cell, mark, next);
                 break;
                 
             case '*':
-                printf("op *\n");
                 cell = ShortMUL (Tree, cell, mark, next);
                 break;
                 
             case '/':
-                printf("op /\n");
                 cell = ShortSUB (Tree, cell, mark, next);
                 break;
                 
@@ -424,9 +420,6 @@ Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
 
 
 Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
-    printf("yes\n");
-    printf("%s %s %s\n", cell->data, cell->nextl->data, cell->nextr->data);
-    printf("%i %i %i\n", cell->type, cell->nextl->type, cell->nextr->type);
     if ((cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
         cell->data = DtoS(StoD(cell->nextl->data) * StoD(cell->nextr->data));
         cell->type = T_value;
@@ -492,7 +485,6 @@ int TreeShort (Tree_t* Tree, Cell_t* cell) {
     do {
         mark = 0;
         TreeShorten(Tree, cell, &mark, NULL);
-        printf("упрощений %i\n", mark);
     } while (mark != 0);
     
     return 0;
