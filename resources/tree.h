@@ -734,6 +734,7 @@ Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cellC, Cell_t* cell, const int ne
     
     Cell_t* cell_copy = CellNew(TreeC);
     cell_copy->data = cell->data;
+    cell_copy->type = cell->type;
     
     cell_copy->prev = cellC;
     

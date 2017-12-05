@@ -33,21 +33,59 @@ enum Type_Tree {
 
 Cell_t* Diffunction (Tree_t* Tree, Cell_t* cell);
 
+
+
 Cell_t* TreeTypeRecurs (Tree_t* Tree, Cell_t* cell);
+
 
 
 Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* dcell_r);
 
 
 
-Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell);
+int TreeShort (Tree_t* Tree, Cell_t* cell);
+
+
+
+int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next);
+
+
+
+int CellDel (Tree_t* Tree, Cell_t* cell);
 
 
 
 double StoD (char* str);
 
 
+
 char* DtoS (double var);
+
+
+
+int CellRegLeft (Tree_t* Tree, Cell_t* cell, int next);
+
+
+
+int CellRegRight (Tree_t* Tree, Cell_t* cell, int next);
+
+
+
+Cell_t* ShortADD(Tree_t* Tree, Cell_t* cell, int* mark, int next);//'+'
+
+
+
+Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next);//'-'
+
+
+
+Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next);//'*'
+
+
+
+Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next);//'/'
+
+
 
 
 
@@ -65,6 +103,8 @@ int main() {
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
     assert(dTree->cell->nextl);
     dTree->cell->nextl->prev = dTree->cell;
+    
+    TreeShort(dTree, dTree->cell->nextl);
     
     TreeDump(dTree, dTree->cell->nextl);
     TreePrintFile(Tree, Tree->cell->nextl);
@@ -125,7 +165,7 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     if (cell->type == T_symbol) {
         char* dx = new char;
         dx = "1";
-        dcell = New_dCell (dTree, T_symbol, dx, NULL, NULL);
+        dcell = New_dCell (dTree, T_value, dx, NULL, NULL);
         assert(dcell);
     }
     
@@ -176,30 +216,45 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 
 
 
-Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell) {
-    if ((cell->type == T_operator) && (cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
+    
+    if ((cell->type == T_operator) && (cell->nextl != NULL) && (cell->nextr != NULL))
+    if (((cell->nextl->nextl == NULL) && (cell->nextl->nextr == NULL)) ||
+        ((cell->nextr->nextl == NULL) && (cell->nextr->nextr == NULL))) {
+        
         switch (cell->data [0]) {
             case '+':
-                cell->data = DtoS(StoD(cell->nextr->data) + StoD(cell->nextl->data));
+                printf("op +\n");
+                cell = ShortADD (Tree, cell, mark, next);
                 break;
                
             case '-':
-                cell->data = DtoS(StoD(cell->nextr->data) - StoD(cell->nextl->data));
+                printf("op -\n");
+                cell = ShortSUB (Tree, cell, mark, next);
                 break;
                 
             case '*':
-                cell->data = DtoS(StoD(cell->nextr->data) * StoD(cell->nextl->data));
+                printf("op *\n");
+                cell = ShortMUL (Tree, cell, mark, next);
                 break;
                 
             case '/':
-                cell->data = DtoS(StoD(cell->nextr->data) / StoD(cell->nextl->data));
+                printf("op /\n");
+                cell = ShortSUB (Tree, cell, mark, next);
                 break;
                 
             default:
                 break;
         }
     }
-    return cell;
+    
+    if (cell->nextl != NULL)
+        TreeShorten (Tree, cell->nextl, mark, LEFT_cell);
+        
+    if (cell->nextr != NULL)
+        TreeShorten (Tree, cell->nextr, mark, RIGHT_cell);
+    
+    return 0;
 }
 
 
@@ -242,6 +297,7 @@ double StoD (char* str) {
     
     return pov;
 }
+
 
 
 char* DtoS (double var) {
@@ -311,4 +367,165 @@ char* DtoS (double var) {
     
     return str;
     
+}
+
+
+
+int CellDel (Tree_t* Tree, Cell_t* cell) {
+    
+    TreeCellDelete(Tree, cell->nextr);
+    TreeCellDelete(Tree, cell->nextl);
+    cell->nextl = NULL;
+    cell->nextr = NULL;
+    
+    return 0;
+}
+
+
+
+Cell_t* ShortADD (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
+    
+    if ((cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+        cell->data = DtoS(StoD(cell->nextl->data) + StoD(cell->nextr->data));
+        cell->type = T_value;
+        CellDel (Tree, cell);
+        ++*mark;
+    }  else
+        if (cell->nextl->data [0] == '0') {
+            CellRegRight (Tree, cell, next);
+            ++*mark;
+        } else
+            if (cell->nextr->data [0] == '0') {
+                CellRegLeft (Tree, cell, next);
+                ++*mark;
+            }
+    
+    return cell;
+}
+
+
+
+Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
+    
+    if ((cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+        cell->data = DtoS(StoD(cell->nextl->data) - StoD(cell->nextr->data));
+        cell->type = T_value;
+        CellDel (Tree, cell);
+        ++*mark;
+    } else
+        if (cell->nextr->data [0] == '0') {
+            CellRegLeft (Tree, cell, next);
+            ++*mark;
+        }
+    
+    return cell;
+}
+
+
+
+Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
+    printf("yes\n");
+    printf("%s %s %s\n", cell->data, cell->nextl->data, cell->nextr->data);
+    printf("%i %i %i\n", cell->type, cell->nextl->type, cell->nextr->type);
+    if ((cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+        cell->data = DtoS(StoD(cell->nextl->data) * StoD(cell->nextr->data));
+        cell->type = T_value;
+        CellDel (Tree, cell);
+        ++*mark;
+    } else
+        if ((cell->nextl->data [0] == '0') || (cell->nextr->data [0] == '0')) {
+            char* str = new char [CELL_SIZE_DATA];
+            str = "0";
+            cell->data = str;
+            cell->type = T_value;
+            CellDel (Tree, cell);
+            ++*mark;
+        } else
+            if (cell->nextl->data [0] == '1') {
+                CellRegRight (Tree, cell, next);
+                ++*mark;
+            } else
+                if (cell->nextr->data [0] == '1') {
+                    CellRegLeft (Tree, cell, next);
+                    ++*mark;
+                }
+    return cell;
+}
+
+
+
+Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
+    
+    if ((cell->nextl->type == T_value) && (cell->nextr->type == T_value)) {
+        
+        cell->data = DtoS(StoD(cell->nextl->data) / StoD(cell->nextr->data));
+        cell->type = T_value;
+        CellDel (Tree, cell);
+        ++*mark;
+    } else
+        if (cell->nextl->data [0] == '0') {
+            char* str = new char [CELL_SIZE_DATA];
+            str = "0";
+            cell->data = str;
+            cell->type = T_value;
+            CellDel (Tree, cell);
+            ++*mark;
+        } else
+            if (cell->nextl->data [0] == '1') {
+                CellRegRight (Tree, cell, next);
+                ++*mark;
+            } else
+                if (cell->nextr->data [0] == '1') {
+                    CellRegLeft (Tree, cell, next);
+                    ++*mark;
+                }
+    
+    return cell;
+}
+
+
+
+int TreeShort (Tree_t* Tree, Cell_t* cell) {
+    
+    int mark = 0;
+    
+    do {
+        mark = 0;
+        TreeShorten(Tree, cell, &mark, NULL);
+        printf("упрощений %i\n", mark);
+    } while (mark != 0);
+    
+    return 0;
+}
+
+
+
+int CellRegLeft (Tree_t* Tree, Cell_t* cell, int next) {
+    
+    cell->nextl->prev = cell->prev;
+    
+    if (next == LEFT_cell)
+        cell->prev->nextl = cell->nextl;
+    else
+        if (next == RIGHT_cell)
+            cell->prev->nextr = cell->nextl;
+    
+    
+    
+    return 0;
+}
+
+
+
+int CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
+    
+    cell->nextr->prev = cell->prev;
+    
+    if (next == LEFT_cell)
+        cell->prev->nextl = cell->nextr;
+    else
+        if (next == RIGHT_cell)
+            cell->prev->nextr = cell->nextr;
+    
+    return 0;
 }
