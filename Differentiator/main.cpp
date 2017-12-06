@@ -48,6 +48,16 @@ enum DiffMark {
 };
 
 
+
+enum NumberTextTeX {
+    BeginDiffTeX = 1,
+    EndDiffTeX = 2,
+    RNDDiffTeX = 3,
+    SpeakDiffTeX = 4,
+    ShortDiffTeX = 5
+};
+
+
 Cell_t* Diffunction (Tree_t* Tree, Cell_t* cell);
 
 
@@ -112,6 +122,12 @@ Cell_t* PrintTexRecurs (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark);
 
 
 
+int TextTeX (int number, char * str, int mark);
+
+
+
+
+
 
 
 int main() {
@@ -129,22 +145,28 @@ int main() {
     
     
     
-    PrintTeX(Tree, Tree->cell->nextl, TeX_print, diff);
+    TextTeX (BeginDiffTeX, NULL, NULL);
+    
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
     assert(dTree->cell->nextl);
     dTree->cell->nextl->prev = dTree->cell;
+    TextTeX (ShortDiffTeX, NULL, NULL);
     TreeShort(dTree, dTree->cell->nextl, LEFT_cell);
     PrintTeX(dTree, dTree->cell->nextl, TeX_print, enddiff);
     
     
     
-    PrintTeX(dTree, dTree->cell->nextl, TeX_print, diff);
+    TextTeX (BeginDiffTeX, NULL, 2);
+    
     ddTree->cell->nextl = Diffunction(ddTree, dTree->cell->nextl);
     assert(ddTree->cell->nextl);
     ddTree->cell->nextl->prev = ddTree->cell;
+    TextTeX (ShortDiffTeX, NULL, NULL);
     TreeShort(ddTree, ddTree->cell->nextl, LEFT_cell);
     PrintTeX(ddTree, ddTree->cell->nextl, TeX_print, enddiff);
     
+    
+    TextTeX (EndDiffTeX, NULL, NULL);
     
     TreeDump(ddTree, ddTree->cell->nextl);
     
@@ -200,24 +222,26 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     
     if ((cell->type == T_value) || (cell->type == T_const)) {
         char* dC = new char;
-        dC = "0";
+        assert(dC);
+        memcpy(dC, "0", 2);
         dcell = New_dCell (dTree, T_value, dC, NULL, NULL);
         assert(dcell);
     }
     
     if (cell->type == T_symbol) {
         char* dx = new char;
+        assert(dx);
         memcpy(dx, "1", 2);
         dcell = New_dCell (dTree, T_value, dx, NULL, NULL);
         assert(dcell);
     }
     
     if (cell->type == T_operator) {
-        
 #define DIFF_( NAME, TYPE, DECLARATION )\
 if (strcmp(#NAME, cell->data) == 0) {\
 dcell = (DECLARATION);\
 assert(dcell);\
+TextTeX (RNDDiffTeX, NULL, 2);\
 PrintTeX(dTree, cell, TeX_print, diff);\
 PrintTeX(dTree, dcell, TeX_print, enddiff);\
 }
@@ -234,7 +258,7 @@ PrintTeX(dTree, dcell, TeX_print, enddiff);\
 
 Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* dcell_r) {
     Cell_t* dcell_new = CellNew(dTree);
-    
+    assert(dcell_new);
     if (type == T_operator) {
         
         dcell_new->nextl = dcell_l;
@@ -346,6 +370,7 @@ char* DtoS (double var) {
     
     int i = 0;
     char* str = new char [CELL_SIZE_DATA];
+    assert(str);
     
     if (var < 0) {
         var = (-1) * var;
@@ -463,7 +488,8 @@ Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
                 ((cell->nextl->type == T_const) && (cell->nextr->type == T_const))) {
                 if (strcmp(cell->nextl->data, cell->nextr->data) == 0) {
                     char* str = new char [CELL_SIZE_DATA];
-                    str = "0";
+                    assert(str);
+                    memcpy(str, "0", 2);
                     cell->data = str;
                     cell->type = T_value;
                     CellDel (Tree, cell);
@@ -485,7 +511,8 @@ Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
     } else
         if ((strcmp("0", cell->nextl->data) == 0) || (strcmp("0", cell->nextr->data) == 0)) {
             char* str = new char [CELL_SIZE_DATA];
-            str = "0";
+            assert(str);
+            memcpy(str, "0", 2);
             cell->data = str;
             cell->type = T_value;
             CellDel (Tree, cell);
@@ -515,7 +542,8 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
     } else
         if (cell->nextl->data [0] == '0') {
             char* str = new char [CELL_SIZE_DATA];
-            str = "0";
+            assert(str);
+            memcpy(str, "0", 2);
             cell->data = str;
             cell->type = T_value;
             CellDel (Tree, cell);
@@ -529,7 +557,8 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
                     ((cell->nextl->type == T_const) && (cell->nextr->type == T_const))) {
                     if (strcmp(cell->nextl->data, cell->nextr->data) == 0) {
                         char* str = new char [CELL_SIZE_DATA];
-                        str = "1";
+                        assert(str);
+                        memcpy(str, "1", 2);
                         cell->data = str;
                         cell->type = T_value;
                         CellDel (Tree, cell);
@@ -711,4 +740,57 @@ Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark) {
         fprintf(file_TeX, "\\right)' ");
     
     return cell;
+}
+
+
+
+int TextTeX (int number, char * str, int mark) {
+    FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
+    if (file_TeX == NULL)
+        return ERROR_DUMP;
+    switch (number) {
+        case BeginDiffTeX:
+            if (mark == NULL)
+                fprintf(file_TeX, "\nПроизводная функции находится очевидным и нетривиальным способом:\n");
+            else {
+                fprintf(file_TeX, "\nПроизводная ");
+                fprintf(file_TeX, "%i ", mark);
+                fprintf(file_TeX, "порядка равна:\n");
+            }
+            break;
+        case EndDiffTeX:
+            fprintf(file_TeX, "\nВообщем смотри, катай и изучай :)\n");
+            break;
+        case RNDDiffTeX:
+            if (mark == NULL)
+                fprintf(file_TeX, "\nДалее будем расматривать призводные функции по частям, дабы облегчить себе задачу.\n");
+            else
+                switch (mark) {
+                    case 1:
+                        fprintf(file_TeX, "\nЭта легкая функция, справится с ней даже школьник.\n");
+                        break;
+                    case 2:
+                        fprintf(file_TeX, "\nДавайте расмотрим подробней эту фунцию.\n");
+                        break;
+                    case 3:
+                        fprintf(file_TeX, "\nТут мы воспользуемся формулами и найдем производную.\n");
+                        break;
+                        
+                    default:
+                        break;
+                }
+                
+            break;
+        case SpeakDiffTeX:
+            fprintf(file_TeX, "\n%s\n", str);
+            break;
+        case ShortDiffTeX:
+            fprintf(file_TeX, "\nТут слегка упростим наше выражение\n");
+            break;
+            
+        default:
+            break;
+    }
+    fclose(file_TeX);
+    return 0;
 }
