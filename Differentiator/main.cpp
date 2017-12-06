@@ -60,11 +60,11 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 
 
 
-int TreeShort (Tree_t* Tree, Cell_t* cell);
+int TreeShort (Tree_t* Tree, Cell_t* cell, int next);
 
 
 
-int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next);
+Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next);
 
 
 
@@ -80,11 +80,11 @@ char* DtoS (double var);
 
 
 
-int CellRegLeft (Tree_t* Tree, Cell_t* cell, int next);
+Cell_t*  CellRegLeft (Tree_t* Tree, Cell_t* cell, int next);
 
 
 
-int CellRegRight (Tree_t* Tree, Cell_t* cell, int next);
+Cell_t*  CellRegRight (Tree_t* Tree, Cell_t* cell, int next);
 
 
 
@@ -126,23 +126,23 @@ int main() {
     TreeGoRound(Tree, Tree->cell->nextl, TreeTypeRecurs, FROM_BELOW);
     
     PrintTeX(NULL, NULL, TeX_begin, NULL);
-    PrintTeX(Tree, Tree->cell->nextl, TeX_print, diff);
     
+    
+    
+    PrintTeX(Tree, Tree->cell->nextl, TeX_print, diff);
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
     assert(dTree->cell->nextl);
     dTree->cell->nextl->prev = dTree->cell;
-    
-    TreeShort(dTree, dTree->cell->nextl);
+    TreeShort(dTree, dTree->cell->nextl, LEFT_cell);
     PrintTeX(dTree, dTree->cell->nextl, TeX_print, enddiff);
     
     
-     
+    
     PrintTeX(dTree, dTree->cell->nextl, TeX_print, diff);
     ddTree->cell->nextl = Diffunction(ddTree, dTree->cell->nextl);
     assert(ddTree->cell->nextl);
     ddTree->cell->nextl->prev = ddTree->cell;
-    
-    TreeShort(ddTree, ddTree->cell->nextl);
+    TreeShort(ddTree, ddTree->cell->nextl, LEFT_cell);
     PrintTeX(ddTree, ddTree->cell->nextl, TeX_print, enddiff);
     
     
@@ -224,6 +224,7 @@ assert(dcell);\
 #undef DIFF_
         
     }
+    //printf("%s\n", dcell->data);
     return dcell;
 }
 
@@ -259,8 +260,7 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 
 
 
-int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
-    
+Cell_t* TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
     if ((cell->type == T_operator) && (cell->nextl != NULL) && (cell->nextr != NULL))
         if (((cell->nextl->nextl == NULL) && (cell->nextl->nextr == NULL)) ||
             ((cell->nextr->nextl == NULL) && (cell->nextr->nextr == NULL))) {
@@ -287,13 +287,14 @@ int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             }
         }
     
+    
     if (cell->nextl != NULL)
-        TreeShorten (Tree, cell->nextl, mark, LEFT_cell);
+        cell = TreeShorten (Tree, cell->nextl, mark, LEFT_cell);
     
     if (cell->nextr != NULL)
-        TreeShorten (Tree, cell->nextr, mark, RIGHT_cell);
+        cell = TreeShorten (Tree, cell->nextr, mark, RIGHT_cell);
     
-    return 0;
+    return cell->prev;
 }
 
 
@@ -431,11 +432,11 @@ Cell_t* ShortADD (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         ++*mark;
     }  else
         if (strcmp("0", cell->nextl->data) == 0) {
-            CellRegRight (Tree, cell, next);
+            cell = CellRegRight (Tree, cell, next);
             ++*mark;
         } else
             if (strcmp("0", cell->nextr->data) == 0) {
-                CellRegLeft (Tree, cell, next);
+                cell = CellRegLeft (Tree, cell, next);
                 ++*mark;
             }
     
@@ -453,7 +454,7 @@ Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         ++*mark;
     } else
         if (strcmp("0", cell->nextr->data) == 0) {
-            CellRegLeft (Tree, cell, next);
+            cell = CellRegLeft (Tree, cell, next);
             ++*mark;
         } else
             if (((cell->nextl->type == T_symbol) && (cell->nextr->type == T_symbol)) ||
@@ -489,11 +490,11 @@ Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             ++*mark;
         } else
             if (strcmp("1", cell->nextl->data) == 0) {
-                CellRegRight (Tree, cell, next);
+                cell = CellRegRight (Tree, cell, next);
                 ++*mark;
             } else
                 if (strcmp("1", cell->nextr->data) == 0) {
-                    CellRegLeft (Tree, cell, next);
+                    cell = CellRegLeft (Tree, cell, next);
                     ++*mark;
                 }
     return cell;
@@ -519,7 +520,7 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             ++*mark;
         } else
             if (strcmp("1", cell->nextr->data) == 0) {
-                CellRegLeft (Tree, cell, next);
+                cell = CellRegLeft (Tree, cell, next);
                 ++*mark;
             } else
                 if (((cell->nextl->type == T_symbol) && (cell->nextr->type == T_symbol)) ||
@@ -539,15 +540,16 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
 
 
 
-int TreeShort (Tree_t* Tree, Cell_t* cell) {
+int TreeShort (Tree_t* Tree, Cell_t* cell, int next) {
     
     int mark = 0;
     
     do {
         mark = 0;
         
-        PrintTeX(Tree, Tree->position_first_cell->nextl, TeX_print, nodiff);
-        TreeShorten(Tree, cell, &mark, NULL);
+        PrintTeX(Tree, Tree->cell->nextl, TeX_print, nodiff);
+        printf("###\n");
+        cell = TreeShorten(Tree, cell, &mark, next);
     } while (mark != 0);
     
     return 0;
@@ -555,7 +557,7 @@ int TreeShort (Tree_t* Tree, Cell_t* cell) {
 
 
 
-int CellRegLeft (Tree_t* Tree, Cell_t* cell, int next) {
+Cell_t*  CellRegLeft (Tree_t* Tree, Cell_t* cell, int next) {
     
     cell->nextl->prev = cell->prev;
     
@@ -567,12 +569,12 @@ int CellRegLeft (Tree_t* Tree, Cell_t* cell, int next) {
     
     
     
-    return 0;
+    return cell->nextl;
 }
 
 
 
-int CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
+Cell_t*  CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
     
     cell->nextr->prev = cell->prev;
     
@@ -582,7 +584,7 @@ int CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
         if (next == RIGHT_cell)
             cell->prev->nextr = cell->nextr;
     
-    return 0;
+    return cell->nextr;
 }
 
 
