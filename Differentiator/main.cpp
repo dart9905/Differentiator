@@ -419,11 +419,11 @@ Cell_t* ShortADD (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         CellDel (Tree, cell);
         ++*mark;
     }  else
-        if (cell->nextl->data [0] == '0') {
+        if (strcmp("0", cell->nextl->data) == 0) {
             CellRegRight (Tree, cell, next);
             ++*mark;
         } else
-            if (cell->nextr->data [0] == '0') {
+            if (strcmp("0", cell->nextr->data) == 0) {
                 CellRegLeft (Tree, cell, next);
                 ++*mark;
             }
@@ -441,7 +441,7 @@ Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         CellDel (Tree, cell);
         ++*mark;
     } else
-        if (cell->nextr->data [0] == '0') {
+        if (strcmp("0", cell->nextr->data) == 0) {
             CellRegLeft (Tree, cell, next);
             ++*mark;
         }
@@ -458,7 +458,7 @@ Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         CellDel (Tree, cell);
         ++*mark;
     } else
-        if ((cell->nextl->data [0] == '0') || (cell->nextr->data [0] == '0')) {
+        if ((strcmp("0", cell->nextl->data) == 0) || (strcmp("0", cell->nextr->data) == 0)) {
             char* str = new char [CELL_SIZE_DATA];
             str = "0";
             cell->data = str;
@@ -466,11 +466,11 @@ Cell_t* ShortMUL (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             CellDel (Tree, cell);
             ++*mark;
         } else
-            if (cell->nextl->data [0] == '1') {
+            if (strcmp("1", cell->nextl->data) == 0) {
                 CellRegRight (Tree, cell, next);
                 ++*mark;
             } else
-                if (cell->nextr->data [0] == '1') {
+                if (strcmp("1", cell->nextr->data) == 0) {
                     CellRegLeft (Tree, cell, next);
                     ++*mark;
                 }
@@ -496,11 +496,11 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             CellDel (Tree, cell);
             ++*mark;
         } else
-            if (cell->nextl->data [0] == '1') {
+            if (strcmp("1", cell->nextl->data) == 0) {
                 CellRegRight (Tree, cell, next);
                 ++*mark;
             } else
-                if (cell->nextr->data [0] == '1') {
+                if (strcmp("1", cell->nextr->data) == 0) {
                     CellRegLeft (Tree, cell, next);
                     ++*mark;
                 }
