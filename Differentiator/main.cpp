@@ -43,7 +43,8 @@ enum paramTeX {
 
 enum DiffMark {
     diff = 1,
-    nodiff = 2
+    nodiff = 2,
+    enddiff = 3
 };
 
 
@@ -118,30 +119,40 @@ int main() {
     char str0 [] = "";
     
     Tree_t* Tree = TreeConstruct(str0);
-    TreeReadFiles(TREE_FILES, Tree, Tree->cell, LEFT_cell);
+    Tree_t* dTree = TreeConstruct(str0);
+    Tree_t* ddTree = TreeConstruct(str0);
     
+    TreeReadFiles(TREE_FILES, Tree, Tree->cell, LEFT_cell);
     TreeGoRound(Tree, Tree->cell->nextl, TreeTypeRecurs, FROM_BELOW);
     
     PrintTeX(NULL, NULL, TeX_begin, NULL);
     PrintTeX(Tree, Tree->cell->nextl, TeX_print, diff);
-    
-    Tree_t* dTree = TreeConstruct(str0);
     
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
     assert(dTree->cell->nextl);
     dTree->cell->nextl->prev = dTree->cell;
     
     TreeShort(dTree, dTree->cell->nextl);
+    PrintTeX(dTree, dTree->cell->nextl, TeX_print, enddiff);
     
-    TreeDump(dTree, dTree->cell->nextl);
-    TreePrintFile(Tree, Tree->cell->nextl);
     
-   
-    //PrintTeX(dTree, dTree->cell->nextl, TeX_print);
+     
+    PrintTeX(dTree, dTree->cell->nextl, TeX_print, diff);
+    ddTree->cell->nextl = Diffunction(ddTree, dTree->cell->nextl);
+    assert(ddTree->cell->nextl);
+    ddTree->cell->nextl->prev = ddTree->cell;
+    
+    TreeShort(ddTree, ddTree->cell->nextl);
+    PrintTeX(ddTree, ddTree->cell->nextl, TeX_print, enddiff);
+    
+    
+    TreeDump(ddTree, ddTree->cell->nextl);
+    
     PrintTeX(NULL, NULL, TeX_end, NULL);
     
     TreeDestructor(Tree);
     TreeDestructor(dTree);
+    TreeDestructor(ddTree);
     
     return 0;
 }
@@ -268,7 +279,7 @@ int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
                     break;
                     
                 case '/':
-                    cell = ShortSUB (Tree, cell, mark, next);
+                    cell = ShortDIV (Tree, cell, mark, next);
                     break;
                     
                 default:
@@ -444,7 +455,18 @@ Cell_t* ShortSUB (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
         if (strcmp("0", cell->nextr->data) == 0) {
             CellRegLeft (Tree, cell, next);
             ++*mark;
-        }
+        } else
+            if (((cell->nextl->type == T_symbol) && (cell->nextr->type == T_symbol)) ||
+                ((cell->nextl->type == T_const) && (cell->nextr->type == T_const))) {
+                if (strcmp(cell->nextl->data, cell->nextr->data) == 0) {
+                    char* str = new char [CELL_SIZE_DATA];
+                    str = "0";
+                    cell->data = str;
+                    cell->type = T_value;
+                    CellDel (Tree, cell);
+                    ++*mark;
+                }
+            }
     
     return cell;
 }
@@ -496,13 +518,20 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
             CellDel (Tree, cell);
             ++*mark;
         } else
-            if (strcmp("1", cell->nextl->data) == 0) {
-                CellRegRight (Tree, cell, next);
+            if (strcmp("1", cell->nextr->data) == 0) {
+                CellRegLeft (Tree, cell, next);
                 ++*mark;
             } else
-                if (strcmp("1", cell->nextr->data) == 0) {
-                    CellRegLeft (Tree, cell, next);
-                    ++*mark;
+                if (((cell->nextl->type == T_symbol) && (cell->nextr->type == T_symbol)) ||
+                    ((cell->nextl->type == T_const) && (cell->nextr->type == T_const))) {
+                    if (strcmp(cell->nextl->data, cell->nextr->data) == 0) {
+                        char* str = new char [CELL_SIZE_DATA];
+                        str = "1";
+                        cell->data = str;
+                        cell->type = T_value;
+                        CellDel (Tree, cell);
+                        ++*mark;
+                    }
                 }
     
     return cell;
@@ -590,7 +619,8 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param, int mark) {
             FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
             fprintf(file_TeX, "\\begin{equation}\n");
             PrintTexRecurs (Tree, cell, file_TeX, mark);
-            fprintf(file_TeX, "=");
+            if (mark != enddiff)
+                fprintf(file_TeX, "=");
             fprintf(file_TeX, "\n\\end{equation}\n");
             fclose(file_TeX);
         }
