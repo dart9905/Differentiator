@@ -14,6 +14,7 @@
 //#include "../resources/diff.h"
 
 
+const char* TEX_NAME_FILES = "fileTeX.tex";
 const char* TREE_FILES = "../resources/save.txt";
 const char* TREE_FILES1 = "../resources/save1.txt";
 const long int LI = 1000000000;
@@ -28,6 +29,14 @@ enum Type_Tree {
     T_value = 2,
     T_operator = 3,
     T_const = 4
+};
+
+
+
+enum paramTeX {
+    TeX_begin = 1,
+    TeX_print = 2,
+    TeX_end = 3
 };
 
 
@@ -87,6 +96,18 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next);//'/'
 
 
 
+int PrintTeX (Tree_t* Tree, Cell_t* cell, int param);
+
+
+
+Cell_t* PrintTexRecurs (Tree_t* Tree, Cell_t* cell, FILE* file_TeX);
+
+
+
+int PrintTexRecursText (char* str);
+
+
+
 
 
 int main() {
@@ -108,6 +129,11 @@ int main() {
     
     TreeDump(dTree, dTree->cell->nextl);
     TreePrintFile(Tree, Tree->cell->nextl);
+    
+    PrintTeX(dTree, dTree->cell->nextl, TeX_begin);
+    PrintTeX(dTree, dTree->cell->nextl, TeX_print);
+    PrintTeX(dTree, dTree->cell->nextl, TeX_end);
+    
     TreeDestructor(Tree);
     TreeDestructor(dTree);
     
@@ -121,15 +147,15 @@ Cell_t* TreeTypeRecurs (Tree_t* Tree, Cell_t* cell) {
     assert(cell);
     
     bool var = true;
-    #define DIFF_( NAME, TYPE, DECLARATION )\
-        if (strcmp(#NAME, cell->data) == 0) {\
-            cell->type = TYPE;\
-            var = false;\
-        }
+#define DIFF_( NAME, TYPE, DECLARATION )\
+if (strcmp(#NAME, cell->data) == 0) {\
+cell->type = TYPE;\
+var = false;\
+}
     
-    #include "../resources/diff.h"
+#include "../resources/diff.h"
     
-    #undef DIFF_
+#undef DIFF_
     
     if (var) {
         if ('0' <= (cell->data [0]) && (cell->data [0]) <= '9') {
@@ -140,7 +166,7 @@ Cell_t* TreeTypeRecurs (Tree_t* Tree, Cell_t* cell) {
                 (strcmp("π", cell->data) == 0)) {
                 cell->type = T_const;
             } else
-            cell->type = T_symbol;
+                cell->type = T_symbol;
     }
     
     return cell->prev;
@@ -170,15 +196,15 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     }
     
     if (cell->type == T_operator) {
-        #define DIFF_( NAME, TYPE, DECLARATION )\
-            if (strcmp(#NAME, cell->data) == 0) {\
-                dcell = (DECLARATION);\
-                assert(dcell);\
-            }
+#define DIFF_( NAME, TYPE, DECLARATION )\
+if (strcmp(#NAME, cell->data) == 0) {\
+dcell = (DECLARATION);\
+assert(dcell);\
+}
         
-        #include "../resources/diff.h"
+#include "../resources/diff.h"
         
-        #undef DIFF_
+#undef DIFF_
         
     }
     return dcell;
@@ -219,34 +245,34 @@ Cell_t* New_dCell (Tree_t* dTree, int type, char* val, Cell_t* dcell_l, Cell_t* 
 int TreeShorten (Tree_t* Tree, Cell_t* cell, int* mark, int next) {
     
     if ((cell->type == T_operator) && (cell->nextl != NULL) && (cell->nextr != NULL))
-    if (((cell->nextl->nextl == NULL) && (cell->nextl->nextr == NULL)) ||
-        ((cell->nextr->nextl == NULL) && (cell->nextr->nextr == NULL))) {
-        
-        switch (cell->data [0]) {
-            case '+':
-                cell = ShortADD (Tree, cell, mark, next);
-                break;
-               
-            case '-':
-                cell = ShortSUB (Tree, cell, mark, next);
-                break;
-                
-            case '*':
-                cell = ShortMUL (Tree, cell, mark, next);
-                break;
-                
-            case '/':
-                cell = ShortSUB (Tree, cell, mark, next);
-                break;
-                
-            default:
-                break;
+        if (((cell->nextl->nextl == NULL) && (cell->nextl->nextr == NULL)) ||
+            ((cell->nextr->nextl == NULL) && (cell->nextr->nextr == NULL))) {
+            
+            switch (cell->data [0]) {
+                case '+':
+                    cell = ShortADD (Tree, cell, mark, next);
+                    break;
+                    
+                case '-':
+                    cell = ShortSUB (Tree, cell, mark, next);
+                    break;
+                    
+                case '*':
+                    cell = ShortMUL (Tree, cell, mark, next);
+                    break;
+                    
+                case '/':
+                    cell = ShortSUB (Tree, cell, mark, next);
+                    break;
+                    
+                default:
+                    break;
+            }
         }
-    }
     
     if (cell->nextl != NULL)
         TreeShorten (Tree, cell->nextl, mark, LEFT_cell);
-        
+    
     if (cell->nextr != NULL)
         TreeShorten (Tree, cell->nextr, mark, RIGHT_cell);
     
@@ -265,7 +291,7 @@ double StoD (char* str) {
         mark = true;
         ++i;
     }
-        
+    
     while ((str [i] != '.') && (str [i] != '\0')) {
         pov = pov * 10 + str[i] - '0';
         ++i;
@@ -518,6 +544,118 @@ int CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
     else
         if (next == RIGHT_cell)
             cell->prev->nextr = cell->nextr;
+    
+    return 0;
+}
+
+
+
+int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
+    switch (param) {
+        case TeX_begin:
+        {
+            FILE *file_TeX = fopen(TEX_NAME_FILES,"wt");
+            if (file_TeX == NULL)
+                return ERROR_DUMP;
+            fprintf(file_TeX, "\\documentclass[a4paper,12pt]{article}\n");
+            fprintf(file_TeX, "\\usepackage[T2A]{fontenc}\n\\usepackage[utf8]{inputenc}\n\\usepackage[english,russian]{babel}\n");
+            fprintf(file_TeX, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}\n");
+            fprintf(file_TeX, "\\begin{document}\n");
+            fprintf(file_TeX, "\\begin{equation}\n");
+            fclose(file_TeX);
+        }
+            break;
+        case TeX_end:
+        {
+            FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
+            if (file_TeX == NULL)
+                return ERROR_DUMP;
+            fprintf(file_TeX, "\n\\end{equation}\n");
+            fprintf(file_TeX, "\\end{document}\n");
+            fclose(file_TeX);
+            system("open -a /Applications/texmaker.app '/Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex'");
+            //system("latex /Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex");
+        }
+            break;
+        case TeX_print:
+        {
+            assert(Tree);
+            assert(cell);
+            FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
+            PrintTexRecurs (Tree, cell, file_TeX);
+            fprintf(file_TeX, "= ");
+            fclose(file_TeX);
+        }
+            break;
+            
+        default:
+            break;
+    }
+    return 0;
+}
+
+
+
+Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX) {
+    assert(Tree);
+    assert(cell);
+    
+    if (cell->data [0] == '/')
+        fprintf(file_TeX, "\\frac{");
+    if (strcmp("log", cell->data) == 0)
+        fprintf(file_TeX, "log_");
+    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+        fprintf(file_TeX, "\\left( ");
+    
+    if (cell->nextl != NULL) {
+        
+        if (cell->nextr == NULL)
+            fprintf(file_TeX, "%s \\left( ", cell->data);
+        
+        
+        fprintf(file_TeX, "{");
+        PrintTexRecurs (Tree, cell->nextl, file_TeX);
+        fprintf(file_TeX, "}");
+        
+        if (cell->nextr != NULL) {
+            if ((cell->data [0] != '/') && (strcmp("log", cell->data) != 0))
+                fprintf(file_TeX, "%s ", cell->data);
+        } else
+            fprintf(file_TeX, "\\right) ");
+    }
+    
+    if (cell->data [0] == '/')
+        fprintf(file_TeX, "}{");
+    
+    
+    if (cell->nextr != NULL) {
+        if (strcmp("log", cell->data) == 0)
+            fprintf(file_TeX, "\\left( ");
+        
+        fprintf(file_TeX, "{");
+        PrintTexRecurs (Tree, cell->nextr, file_TeX);
+        fprintf(file_TeX, "}");
+        
+        if (strcmp("log", cell->data) == 0)
+            fprintf(file_TeX, "\\right) ");
+    }
+    
+    
+    if ((cell->nextl == NULL) && (cell->nextr == NULL)) {
+        fprintf(file_TeX, "%s ", cell->data);
+    }
+    
+    if (cell->data [0] == '/')
+        fprintf(file_TeX, "}");
+    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+        fprintf(file_TeX, "\\right) ");
+    
+    return cell;
+}
+
+
+
+int PrintTexRecursText (char* str) {
     
     return 0;
 }
