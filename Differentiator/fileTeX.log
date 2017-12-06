@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.15)  6 DEC 2017 22:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.15)  7 DEC 2017 01:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -684,20 +684,20 @@ LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
 (./fileTeX.aux)
 \openout1 = `fileTeX.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 6.
-LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
@@ -789,39 +789,41 @@ e
 \Gin@req@height=\dimen124
 \Gin@req@width=\dimen125
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 11.
+LaTeX Font Info:    Try loading font information for U+msa on input line 9.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 11.
+LaTeX Font Info:    Try loading font information for U+msb on input line 9.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./file
-TeX.aux) ) 
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] (./
+fileTeX.aux) ) 
 Here is how much of TeX's memory you used:
- 4455 strings out of 492995
- 57242 string characters out of 6132703
- 130487 words of memory out of 5000000
- 7926 multiletter control sequences out of 15000+600000
- 9087 words of font info for 33 fonts, out of 8000000 for 9000
+ 4481 strings out of 492995
+ 57604 string characters out of 6132703
+ 126495 words of memory out of 5000000
+ 7949 multiletter control sequences out of 15000+600000
+ 14846 words of font info for 52 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 53i,9n,30p,254b,133s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-super/cm-super
--t2a.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cme
-x10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi
-12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8
-.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.p
-fb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pf
-b></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-</usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
-Output written on fileTeX.pdf (1 page, 67614 bytes).
+ 53i,6n,30p,267b,194s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-super/cm-s
+uper-t2a.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmex10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmmi12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mmi8.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy1
+0.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.
+pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pf
+b></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb>
+</usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pfb>
+Output written on fileTeX.pdf (2 pages, 88322 bytes).
 PDF statistics:
- 37 PDF objects out of 1000 (max. 8388607)
- 26 compressed objects within 1 object stream
+ 48 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
