@@ -207,22 +207,24 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     
     if (cell->type == T_symbol) {
         char* dx = new char;
-        dx = "1";
+        memcpy(dx, "1", 2);
         dcell = New_dCell (dTree, T_value, dx, NULL, NULL);
         assert(dcell);
     }
     
     if (cell->type == T_operator) {
+        
 #define DIFF_( NAME, TYPE, DECLARATION )\
 if (strcmp(#NAME, cell->data) == 0) {\
 dcell = (DECLARATION);\
 assert(dcell);\
+PrintTeX(dTree, cell, TeX_print, diff);\
+PrintTeX(dTree, dcell, TeX_print, enddiff);\
 }
         
 #include "../resources/diff.h"
         
 #undef DIFF_
-        
     }
     //printf("%s\n", dcell->data);
     return dcell;
@@ -548,7 +550,6 @@ int TreeShort (Tree_t* Tree, Cell_t* cell, int next) {
         mark = 0;
         
         PrintTeX(Tree, Tree->cell->nextl, TeX_print, nodiff);
-        printf("###\n");
         cell = TreeShorten(Tree, cell, &mark, next);
     } while (mark != 0);
     
@@ -610,7 +611,9 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param, int mark) {
                 return ERROR_DUMP;
             fprintf(file_TeX, "\\end{document}\n");
             fclose(file_TeX);
-            system("open -a /Applications/texmaker.app '/Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex'");
+            //system("pdflatex.exe -synctex=1 -interaction=nonstopmode /Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex");
+            //system("start /Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex");
+                system("open -a /Applications/texmaker.app '/Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex'");
             //system("latex /Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex");
         }
             break;
@@ -646,8 +649,12 @@ Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark) {
         fprintf(file_TeX, "\\frac{");
     if (strcmp("log", cell->data) == 0)
         fprintf(file_TeX, "\\log_");
-    if (((cell->data [0] == '+') || (cell->data [0] == '-')) && (strcmp("sqrt", cell->prev->data) != 0))
-        fprintf(file_TeX, "\\left( ");
+    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+        if (cell->prev != 0) {
+            if (strcmp("sqrt", cell->prev->data) != 0)
+                fprintf(file_TeX, "\\left( ");
+        } else
+            fprintf(file_TeX, "\\left( ");
     
     if (cell->nextl != NULL) {
         if (strcmp("sqrt", cell->data) == 0)
@@ -693,8 +700,12 @@ Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark) {
     
     if (cell->data [0] == '/')
         fprintf(file_TeX, "}");
-    if (((cell->data [0] == '+') || (cell->data [0] == '-')) && (strcmp("sqrt", cell->prev->data) != 0))
-        fprintf(file_TeX, "\\right) ");
+    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+        if (cell->prev != 0) {
+            if (strcmp("sqrt", cell->prev->data) != 0)
+                fprintf(file_TeX, "\\right) ");
+        } else
+            fprintf(file_TeX, "\\right) ");
     
     if (mark == diff)
         fprintf(file_TeX, "\\right)' ");
