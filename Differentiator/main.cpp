@@ -40,6 +40,13 @@ enum paramTeX {
 };
 
 
+
+enum DiffMark {
+    diff = 1,
+    nodiff = 2
+};
+
+
 Cell_t* Diffunction (Tree_t* Tree, Cell_t* cell);
 
 
@@ -96,15 +103,11 @@ Cell_t* ShortDIV (Tree_t* Tree, Cell_t* cell, int* mark, int next);//'/'
 
 
 
-int PrintTeX (Tree_t* Tree, Cell_t* cell, int param);
+int PrintTeX (Tree_t* Tree, Cell_t* cell, int param, int mark);
 
 
 
-Cell_t* PrintTexRecurs (Tree_t* Tree, Cell_t* cell, FILE* file_TeX);
-
-
-
-int PrintTexRecursText (char* str);
+Cell_t* PrintTexRecurs (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark);
 
 
 
@@ -119,6 +122,9 @@ int main() {
     
     TreeGoRound(Tree, Tree->cell->nextl, TreeTypeRecurs, FROM_BELOW);
     
+    PrintTeX(NULL, NULL, TeX_begin, NULL);
+    PrintTeX(Tree, Tree->cell->nextl, TeX_print, diff);
+    
     Tree_t* dTree = TreeConstruct(str0);
     
     dTree->cell->nextl = Diffunction(dTree, Tree->cell->nextl);
@@ -130,9 +136,9 @@ int main() {
     TreeDump(dTree, dTree->cell->nextl);
     TreePrintFile(Tree, Tree->cell->nextl);
     
-    PrintTeX(dTree, dTree->cell->nextl, TeX_begin);
-    PrintTeX(dTree, dTree->cell->nextl, TeX_print);
-    PrintTeX(dTree, dTree->cell->nextl, TeX_end);
+   
+    //PrintTeX(dTree, dTree->cell->nextl, TeX_print);
+    PrintTeX(NULL, NULL, TeX_end, NULL);
     
     TreeDestructor(Tree);
     TreeDestructor(dTree);
@@ -510,6 +516,8 @@ int TreeShort (Tree_t* Tree, Cell_t* cell) {
     
     do {
         mark = 0;
+        
+        PrintTeX(Tree, Tree->position_first_cell->nextl, TeX_print, nodiff);
         TreeShorten(Tree, cell, &mark, NULL);
     } while (mark != 0);
     
@@ -550,7 +558,7 @@ int CellRegRight (Tree_t* Tree, Cell_t* cell, int next) {
 
 
 
-int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
+int PrintTeX (Tree_t* Tree, Cell_t* cell, int param, int mark) {
     switch (param) {
         case TeX_begin:
         {
@@ -561,7 +569,6 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
             fprintf(file_TeX, "\\usepackage[T2A]{fontenc}\n\\usepackage[utf8]{inputenc}\n\\usepackage[english,russian]{babel}\n");
             fprintf(file_TeX, "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}\n");
             fprintf(file_TeX, "\\begin{document}\n");
-            fprintf(file_TeX, "\\begin{equation}\n");
             fclose(file_TeX);
         }
             break;
@@ -570,7 +577,6 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
             FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
             if (file_TeX == NULL)
                 return ERROR_DUMP;
-            fprintf(file_TeX, "\n\\end{equation}\n");
             fprintf(file_TeX, "\\end{document}\n");
             fclose(file_TeX);
             system("open -a /Applications/texmaker.app '/Users/macbook/Documents/GitHub/Differentiator/Differentiator/fileTeX.tex'");
@@ -582,8 +588,10 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
             assert(Tree);
             assert(cell);
             FILE *file_TeX = fopen(TEX_NAME_FILES,"at");
-            PrintTexRecurs (Tree, cell, file_TeX);
-            fprintf(file_TeX, "= ");
+            fprintf(file_TeX, "\\begin{equation}\n");
+            PrintTexRecurs (Tree, cell, file_TeX, mark);
+            fprintf(file_TeX, "=");
+            fprintf(file_TeX, "\n\\end{equation}\n");
             fclose(file_TeX);
         }
             break;
@@ -596,32 +604,38 @@ int PrintTeX (Tree_t* Tree, Cell_t* cell, int param) {
 
 
 
-Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX) {
+Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX, int mark) {
     assert(Tree);
     assert(cell);
     
+    if (mark == diff)
+        fprintf(file_TeX, "\\left( ");
     if (cell->data [0] == '/')
         fprintf(file_TeX, "\\frac{");
     if (strcmp("log", cell->data) == 0)
-        fprintf(file_TeX, "log_");
-    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+        fprintf(file_TeX, "\\log_");
+    if (((cell->data [0] == '+') || (cell->data [0] == '-')) && (strcmp("sqrt", cell->prev->data) != 0))
         fprintf(file_TeX, "\\left( ");
     
     if (cell->nextl != NULL) {
-        
-        if (cell->nextr == NULL)
+        if (strcmp("sqrt", cell->data) == 0)
+            fprintf(file_TeX, "\\%s {", cell->data);
+        if ((cell->nextr == NULL) && (strcmp("sqrt", cell->data) != 0))
             fprintf(file_TeX, "%s \\left( ", cell->data);
         
         
         fprintf(file_TeX, "{");
-        PrintTexRecurs (Tree, cell->nextl, file_TeX);
+        PrintTexRecurs (Tree, cell->nextl, file_TeX, nodiff);
         fprintf(file_TeX, "}");
         
         if (cell->nextr != NULL) {
             if ((cell->data [0] != '/') && (strcmp("log", cell->data) != 0))
                 fprintf(file_TeX, "%s ", cell->data);
         } else
-            fprintf(file_TeX, "\\right) ");
+            if (strcmp("sqrt", cell->data) != 0)
+                fprintf(file_TeX, "\\right) ");
+            else
+                fprintf(file_TeX, "} ");
     }
     
     if (cell->data [0] == '/')
@@ -633,7 +647,7 @@ Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX) {
             fprintf(file_TeX, "\\left( ");
         
         fprintf(file_TeX, "{");
-        PrintTexRecurs (Tree, cell->nextr, file_TeX);
+        PrintTexRecurs (Tree, cell->nextr, file_TeX, nodiff);
         fprintf(file_TeX, "}");
         
         if (strcmp("log", cell->data) == 0)
@@ -647,15 +661,11 @@ Cell_t* PrintTexRecurs  (Tree_t* Tree, Cell_t* cell, FILE* file_TeX) {
     
     if (cell->data [0] == '/')
         fprintf(file_TeX, "}");
-    if ((cell->data [0] == '+') || (cell->data [0] == '-'))
+    if (((cell->data [0] == '+') || (cell->data [0] == '-')) && (strcmp("sqrt", cell->prev->data) != 0))
         fprintf(file_TeX, "\\right) ");
     
-    return cell;
-}
-
-
-
-int PrintTexRecursText (char* str) {
+    if (mark == diff)
+        fprintf(file_TeX, "\\right)' ");
     
-    return 0;
+    return cell;
 }

@@ -13,6 +13,7 @@ struct Cell_t  {
     Cell_t* prev;                  ///<pointer on next element cell, if his on that it is empty
     int number;                    ///<cell number from the list
     int type;                      ///<type cell
+    //int mark;
 };
 
 
@@ -320,6 +321,7 @@ Tree_t*  TreeConstruct (TYPE_TREE element)
     cell->prev = NULL;
     cell->nextl = NULL;
     cell->nextr = NULL;
+    //cell->mark = 0;
     
     Tree->cell = cell;
     
@@ -735,6 +737,7 @@ Cell_t* TreeCopyRecurs (Tree_t* TreeC, Cell_t* cellC, Cell_t* cell, const int ne
     Cell_t* cell_copy = CellNew(TreeC);
     cell_copy->data = cell->data;
     cell_copy->type = cell->type;
+    //cell_copy->mark = cell->mark;
     
     cell_copy->prev = cellC;
     
