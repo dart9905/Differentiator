@@ -159,9 +159,10 @@ int main() {
     PrintTeX(dTree, dTree->cell->nextl, TeX_print, enddiff);
     
     
+    
     TextTeX (EndDiffTeX, NULL, NULL);
     
-    //TreeDump(dTree, dTree->cell->nextl);
+    TreeDump(dTree, dTree->cell->nextl);
     
     PrintTeX(NULL, NULL, TeX_end, NULL);
     
@@ -757,7 +758,7 @@ int TextTeX (int number, char * str, int mark) {
             }
             break;
         case EndDiffTeX:
-            fprintf(file_TeX, "\nВообщем, смотри, катай и изучай :)\n");
+            fprintf(file_TeX, "\nВ общем, смотри, катай и изучай :)\n");
             break;
         case RNDDiffTeX:
             if (mark == NULL)
