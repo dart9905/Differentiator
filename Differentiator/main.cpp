@@ -22,6 +22,8 @@ typedef char* TYPE_TREE;
 
 #include "../resources/tree.h"
 
+#include "../resources/read.h"
+
 
 enum Type_Tree {
     T_symbol = 1,
@@ -137,7 +139,11 @@ int main() {
     Tree_t* Tree = TreeConstruct(str0);
     Tree_t* dTree = TreeConstruct(str0);
     
-    TreeReadFiles(TREE_FILES, Tree, Tree->cell, LEFT_cell);
+    long int number_of_char = 0;
+    char* my_buffer = ReadFiles (TREE_FILES , &number_of_char);
+    
+    Tree->cell->nextl = GetG0(Tree, my_buffer);
+    Tree->cell->nextl->prev = Tree->cell;
     TreeGoRound(Tree, Tree->cell->nextl, TreeTypeRecurs, FROM_BELOW);
     
     PrintTeX(NULL, NULL, TeX_begin, NULL);
