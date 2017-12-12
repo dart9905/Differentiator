@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.15)  9 DEC 2017 11:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.15)  11 DEC 2017 17:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -800,61 +800,30 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 9.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (112.23506pt too wide) detected at line 45
-[] \OMS/cmsy/m/n/12 ^^C []
- []
-
-
-Overfull \hbox (112.23506pt too wide) detected at line 53
-[] \OMS/cmsy/m/n/12 ^^C []
- []
-
-
-Overfull \hbox (124.70714pt too wide) detected at line 61
-[] \OMS/cmsy/m/n/12 ^^C [] \OT1/cmr/m/n/12 =
- []
-
-
-Overfull \hbox (89.48863pt too wide) detected at line 64
-[] \OMS/cmsy/m/n/12 ^^C [] \OT1/cmr/m/n/12 =
- []
-
-
-Overfull \hbox (60.00285pt too wide) detected at line 67
-[] \OMS/cmsy/m/n/12 ^^C [] \OT1/cmr/m/n/12 =
- []
-
-[2]
-Overfull \hbox (47.53078pt too wide) detected at line 70
-[] \OMS/cmsy/m/n/12 ^^C []
- []
-
-[3] (./fileTeX.aux) ) 
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] (./
+fileTeX.aux) ) 
 Here is how much of TeX's memory you used:
  4481 strings out of 492995
  57604 string characters out of 6132703
- 132495 words of memory out of 5000000
+ 126495 words of memory out of 5000000
  7949 multiletter control sequences out of 15000+600000
  14846 words of font info for 52 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 53i,11n,30p,384b,194s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-sup
-er/cm-super-t2a.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmex10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmmi12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmmi8.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmr12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmr8.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-sy8.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm120
-0.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1440.
-pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pf
-b>
-Output written on fileTeX.pdf (3 pages, 103133 bytes).
+ 53i,6n,30p,267b,194s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-super/cm-s
+uper-t2a.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmex10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmmi12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+8.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10
+.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.p
+fb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb
+></usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb><
+/usr/local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pfb>
+Output written on fileTeX.pdf (2 pages, 89804 bytes).
 PDF statistics:
- 55 PDF objects out of 1000 (max. 8388607)
- 39 compressed objects within 1 object stream
+ 48 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
