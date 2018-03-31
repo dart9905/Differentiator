@@ -220,15 +220,16 @@ Cell_t* Diffunction (Tree_t* dTree, Cell_t* cell) {
     Cell_t* dcell = NULL;// = CellNew(dTree);
     
     if ((cell->type == T_value) || (cell->type == T_const)) {
-        char* dC = new char;
+        char* dC = new char [2] {};//{'u'};
         assert(dC);
         memcpy(dC, "0", 2);
+        //strdup(<#const char *__s1#>)
         dcell = New_dCell (dTree, T_value, dC, NULL, NULL);
         assert(dcell);
     }
     
     if (cell->type == T_symbol) {
-        char* dx = new char;
+        char* dx = new char [2] {};
         assert(dx);
         memcpy(dx, "1", 2);
         dcell = New_dCell (dTree, T_value, dx, NULL, NULL);
